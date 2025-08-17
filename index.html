@@ -45,10 +45,9 @@
   <div id="result">Scan a barcode to see the result here</div>
   <button onclick="copyResult()">Copy Result</button>
 
+  <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
   <script type="module">
-    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/library@latest/esm/index.js';
-
-    const codeReader = new BrowserMultiFormatReader();
+    const codeReader = new ZXing.BrowserMultiFormatReader();
     const videoElement = document.getElementById('video');
     const resultElement = document.getElementById('result');
 
