@@ -41,7 +41,7 @@
 </head>
 <body>
   <h1>📷 Free Barcode Scanner</h1>
-  <video id="video" playsinline></video>
+  <video id="video" autoplay playsinline muted></video>
   <div id="result">Scan a barcode to see the result here</div>
   <button onclick="copyResult()">Copy Result</button>
 
@@ -54,20 +54,20 @@
 
     async function startScanner() {
       try {
-        const devices = await codeReader.listVideoInputDevices();
-        if (devices.length === 0) {
-          resultElement.textContent = 'No camera found';
-          return;
-        }
+        // Explicitly request environment (rear) camera on iOS
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: "environment" } }
+        });
 
-        const selectedDeviceId = devices[0].deviceId;
-        codeReader.decodeFromVideoDevice(selectedDeviceId, videoElement, (result, err) => {
+        videoElement.srcObject = stream;
+
+        codeReader.decodeFromVideoDevice(null, videoElement, (result, err) => {
           if (result) {
             resultElement.textContent = `Scanned: ${result.text}`;
           }
         });
       } catch (error) {
-        resultElement.textContent = `Error: ${error}`;
+        resultElement.textContent = `Error: ${error.name} – ${error.message}`;
       }
     }
 
