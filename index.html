@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Barcode Scanner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    video {
+      width: 100%;
+      max-width: 500px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: green;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>📷 Free Barcode Scanner</h1>
+  <video id="video" playsinline></video>
+  <div id="result">Scan a barcode to see the result here</div>
+  <button onclick="copyResult()">Copy Result</button>
+
+  <script type="module">
+    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/library@latest/esm/index.js';
+
+    const codeReader = new BrowserMultiFormatReader();
+    const videoElement = document.getElementById('video');
+    const resultElement = document.getElementById('result');
+
+    async function startScanner() {
+      try {
+        const devices = await codeReader.listVideoInputDevices();
+        if (devices.length === 0) {
+          resultElement.textContent = 'No camera found';
+          return;
+        }
+
+        const selectedDeviceId = devices[0].deviceId;
+        codeReader.decodeFromVideoDevice(selectedDeviceId, videoElement, (result, err) => {
+          if (result) {
+            resultElement.textContent = `Scanned: ${result.text}`;
+          }
+        });
+      } catch (error) {
+        resultElement.textContent = `Error: ${error}`;
+      }
+    }
+
+    startScanner();
+
+    window.copyResult = function() {
+      const text = resultElement.textContent.replace('Scanned: ', '');
+      if (text && text !== 'Scan a barcode to see the result here') {
+        navigator.clipboard.writeText(text);
+        alert('Copied to clipboard: ' + text);
+      }
+    }
+  </script>
+</body>
+</html>
